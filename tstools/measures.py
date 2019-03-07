@@ -58,13 +58,20 @@ class measures(object):
 
     dbPath = os.getcwd() + '/measures_database'
     command = '''CREATE TABLE measures
-                  (id text, lat text, lon text, year1 text, year2 text, direction text, coverType text,
-                  condition text, change text, chaOther text, confCA text,
-                  class text, water text, bare text, albedo text, use text,
-                  height text, transport text, impervious text, density text,
-                  vegType1 text, herbaceous text, shrub text, forestPhenology text,
-                  leafType text, location text, confidence real, notes text,
-                  byear text, brange1 text, brange2 text)'''
+                  (id text, lat text, lon text, year1 text, year2 text, coverType text,
+                  condition text, class1 text, water text, bare text, albedo text, use text,
+                  height text, transport text, impervious text, density text, vegType text, herbType text,
+                  shrubType text, phenology text, leafType text, location text, conf text, notes1 text,
+                  segType text, direction text, changeAgent text, confCA text, ca_other text, seg_notes text,
+                  breakYear text, breakRange1 text, breakRange2 text)'''
+
+                  #change text, chaOther text, confCA text,
+                  #class text, water text, bare text, albedo text, use text,
+                  #height text, transport text, impervious text, density text,
+                  #vegType1 text, herbaceous text, shrub text, forestPhenology text,
+                  #leafType text, location text, confidence real, notes text,
+                  #byear text, brange1 text, brange2 text)'''
+
     conn = sql.make_db(dbPath, command)
 
 
@@ -388,7 +395,7 @@ class measures(object):
         else:
             measures.break_years.disabled = True
             measures.break_year.disabled = True
-    
+
     # If segment is stable, disable LCC direction and change agent
     def toggle_transitional_opts(selection):
         if selection.new == "Transitional":
@@ -749,9 +756,9 @@ class measures(object):
         b_confCA = 'N/A'
         b_direction = 'N/A'
         location = 'N/A'
-       
+
         coverType = measures.drop0.value
-        
+
         # Segment type
         seg_type = measures.drop9.value
         direction = measures.direction.value
@@ -763,7 +770,7 @@ class measures(object):
         changeAgent = ', '.join(changeAgent)
         confCA = measures.ca_confidence.value
         ca_other = measures.change_other.value
-        
+
         if ca_other == 'Specify other':
             ca_other = 'N/A'
         seg_notes = measures.notes_seg_trend.value
@@ -828,12 +835,12 @@ class measures(object):
         idSample = measures.current_id
         lat = measures.m.center[0]
         lon = measures.m.center[1]
-        
+
         sampleInput = (idSample, lat, lon, year1, year2, coverType, condition,
-                       class1, waterType, bareType, albedo, use, height, 
-                       transport, impervious, density, vegType1, 
+                       class1, waterType, bareType, albedo, use, height,
+                       transport, impervious, density, vegType1,
                        herbaceousType, shrubType, forestPhenology, leafType,
-                       location, conf, notes_value, seg_type, direction, 
+                       location, conf, notes_value, seg_type, direction,
                        changeAgent, confCA, ca_other, seg_notes,
                        break_year, break_range1, break_range2)
 
@@ -850,21 +857,21 @@ class measures(object):
 
 
         # Save to drive
-        sampleInputList = [str(idSample), str(lat), str(lon), str(year1), 
+        sampleInputList = [str(idSample), str(lat), str(lon), str(year1),
                            str(year2), coverType, condition,
-                           class1, waterType, bareType, albedo, 
+                           class1, waterType, bareType, albedo,
                            use, height, transport, impervious, density,
-                           vegType1, herbaceousType, shrubType, 
-                           forestPhenology, leafType, location, str(conf), 
-                           notes_value, seg_type, direction, changeAgent, 
+                           vegType1, herbaceousType, shrubType,
+                           forestPhenology, leafType, location, str(conf),
+                           notes_value, seg_type, direction, changeAgent,
                            str(confCA), ca_other, seg_notes]
 
         sampleInputListFull = sampleInputList
 
         # Save break information to second sheet, FIX TO REFLECT SEGMENT CHANGE TAB!
         if condition == 'Break':
-            breakList = [str(idSample), str(lat), str(lon), b_changeAgent, 
-            b_ca_other, b_confCA, break_year, break_range1, break_range2, 
+            breakList = [str(idSample), str(lat), str(lon), b_changeAgent,
+            b_ca_other, b_confCA, break_year, break_range1, break_range2,
             b_direction, b_notes_value]
             measures.sheet2.insert_row(breakList, 2)
             count = len(measures.sheet2.col_values(1))
@@ -957,7 +964,7 @@ class measures(object):
     load_button.on_click(load_everything)
 
     dc = ipyleaflet.DrawControl(marker={'shapeOptions': {'color': '#ff0000'}},
-                                polygon={}, circle={}, circlemarker={}, 
+                                polygon={}, circle={}, circlemarker={},
                                 polyline={})
 
     zoom = 5
